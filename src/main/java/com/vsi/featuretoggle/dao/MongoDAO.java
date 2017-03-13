@@ -8,16 +8,18 @@ import org.springframework.data.mongodb.core.query.Update;
 import com.vsi.featuretoggle.model.Feature;
 import java.util.List;
 
-public class MongoDAO {
-    public void saveFeatureToggle(Feature feature) {
+public class MongoDAO implements ToggleDAO {
+    public Feature save(Feature feature) {
         if(feature == null || feature.getName() == null) {
-            return;
+            return null;
         }
         MongoOperations operations  = MongoFactory.getMongoOperations();
         operations.save(feature);
+
+        return feature;
     }
 
-    public Feature getFeatureToggle(String name) {
+    public Feature findByName(String name) {
         if(name == null || name.isEmpty()) {
             return null;
         }
@@ -26,23 +28,25 @@ public class MongoDAO {
         return operations.findOne(searchToggleQuery, Feature.class);
     }
 
-    public void updateFeatureToggle(Feature feature) {
+    public Feature update(Feature feature) {
         if(feature == null )
-            return;
+            return null;
         MongoOperations operations = MongoFactory.getMongoOperations();
         operations.save(feature);
+        return feature;
     }
 
-    public void deleteFeatureToggle(Feature feature) {
+    public boolean delete(Feature feature) {
         if(feature == null)
-            return;
+            return false;
 
         MongoOperations operations = MongoFactory.getMongoOperations();
         Query query = new Query(Criteria.where("name").is(feature.getName()));
         operations.findAndRemove(query, Feature.class);
+        return true;
     }
 
-    public List<Feature> getAllFeatureToggles() {
+    public List<Feature> getAll() {
         MongoOperations operations = MongoFactory.getMongoOperations();
         return operations.findAll(Feature.class);
     }

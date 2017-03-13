@@ -10,6 +10,8 @@ import org.springframework.data.mongodb.core.query.Update;
 import com.vsi.featuretoggle.model.Feature;
 import com.vsi.featuretoggle.dao.MongoDAO;
 import java.util.List;
+import com.vsi.featuretoggle.service.ToggleService;
+
 
 public class Main {
 
@@ -20,13 +22,15 @@ public class Main {
 
         //MongoOperations mongoOperation = MongoDAO.getMongoOperations();
 
-        MongoDAO dao = new MongoDAO();
+        //MongoDAO dao = new MongoDAO();
+        ToggleService service = new ToggleService();
 
         Feature feature = new Feature("BOPS", "Buy Online Pick in Store", true);
 
         // save
         //mongoOperation.save(feature);
-        dao.saveFeatureToggle(feature);
+        //dao.save(feature);
+        service.createFeatureToggle(feature);
 
         // now toggle object got the created id.
         System.out.println("1. feature name: " + feature.getName());
@@ -36,7 +40,9 @@ public class Main {
         Query searchToggleQuery= new Query(Criteria.where("name").is("BOPS"));
 
         // find the saved feature again.
-        Feature savedFeature = dao.getFeatureToggle(feature.getName());
+        //Feature savedFeature = dao.findByName(feature.getName());
+        Feature savedFeature = service.getFeature(feature.getName());
+        System.out.println("savedFeature: " + savedFeature);
         //Feature savedFeature = mongoOperation.findOne(searchToggleQuery, Feature.class);
         System.out.println("2. find - saved feature state: " + savedFeature.isOn());
 
@@ -45,21 +51,25 @@ public class Main {
           //      Update.update("state", false),Feature.class);
 
         savedFeature.setState(false);
-        dao.updateFeatureToggle(savedFeature);
+        //dao.update(savedFeature);
+        service.updateFeatureToggle(savedFeature);
         // find the updated user object
         //Feature updatedFeatureToggle = mongoOperation.findOne(searchToggleQuery, Feature.class);
-        Feature updatedFeatureToggle = dao.getFeatureToggle(savedFeature.getName());
+        //Feature updatedFeatureToggle = dao.findByName(savedFeature.getName());
+        Feature updatedFeatureToggle = service.getFeature(savedFeature.getName());
 
         System.out.println("3. updatedFeature state: " + updatedFeatureToggle.isOn());
 
         // delete
         //mongoOperation.remove(searchToggleQuery, Feature.class);
 
-        dao.deleteFeatureToggle(feature);
+        //dao.delete(feature);
+        service.deleteFeatureToggle(feature.getName());
 
         // List, it should be empty now.
         //List<Feature> listFeatures = mongoOperation.findAll(Feature.class);
-        List<Feature> listFeatures = dao.getAllFeatureToggles();
+        //List<Feature> listFeatures = dao.getAll();
+        List<Feature> listFeatures = service.getAllFeatures();
         System.out.println("4. Number of Feature Toggles= " + listFeatures.size());
     }
 }
